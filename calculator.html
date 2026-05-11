@@ -5,199 +5,310 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tridonic DALI Bus Power Configurator</title>
     <style>
+        /* Tridonic Corporate Identity Colors */
         :root {
             --tridonic-red: #eb0028;
-            --tridonic-dark: #333333;
-            --tridonic-light-grey: #f4f4f4;
-            --tridonic-border: #e0e0e0;
-            --safe-green: #28a745;
+            --tridonic-black: #000000;
+            --tridonic-dark-gray: #333333;
+            --tridonic-light-gray: #f2f2f2;
+            --tridonic-border: #dcdcdc;
+            --safe-green: #008a4b; /* Industry standard for 'Safe' in technical tools */
         }
 
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: #ffffff;
-            color: var(--tridonic-dark);
+            color: var(--tridonic-dark-gray);
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            line-height: 1.6;
         }
 
+        /* Header Styling */
         header {
-            border-bottom: 3px solid var(--tridonic-red);
-            margin-bottom: 30px;
-            padding-bottom: 10px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        h1 { font-size: 24px; margin: 0; }
-        h2 { font-size: 18px; color: var(--tridonic-red); }
-
-        .configurator-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
-        }
-
-        .dali-line-card {
-            background: var(--tridonic-light-grey);
-            border: 1px solid var(--tridonic-border);
-            border-radius: 4px;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .input-group {
-            margin-bottom: 15px;
+            background-color: #ffffff;
+            padding: 20px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 4px solid var(--tridonic-red);
         }
 
-        label { font-size: 14px; font-weight: 600; }
+        .logo img {
+            height: 40px; /* Standard scaled logo size */
+        }
+
+        .tool-title {
+            text-align: right;
+        }
+
+        .tool-title h1 {
+            margin: 0;
+            font-size: 22px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--tridonic-black);
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Configurator Layout */
+        .configurator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 30px;
+        }
+
+        .dali-line-card {
+            border: 1px solid var(--tridonic-border);
+            padding: 25px;
+            background: #fff;
+            position: relative;
+        }
+
+        .dali-line-card h2 {
+            margin-top: 0;
+            font-size: 18px;
+            color: var(--tridonic-red);
+            border-bottom: 1px solid var(--tridonic-border);
+            padding-bottom: 10px;
+        }
+
+        .category-label {
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #999;
+            margin: 15px 0 5px 0;
+        }
+
+        .input-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f9f9f9;
+        }
+
+        .device-info {
+            font-size: 14px;
+        }
+
+        .device-specs {
+            display: block;
+            font-size: 11px;
+            color: #777;
+        }
 
         input[type="number"] {
-            width: 60px;
-            padding: 8px;
+            width: 55px;
+            padding: 5px;
             border: 1px solid var(--tridonic-border);
-            border-radius: 4px;
             text-align: center;
+            font-weight: bold;
         }
 
+        /* Status Area */
         .status-panel {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 2px solid #ddd;
+            margin-top: 30px;
+            padding: 15px;
+            background-color: var(--tridonic-light-gray);
         }
 
         .metric {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 5px;
             font-weight: bold;
+            margin-bottom: 5px;
         }
 
         .progress-container {
-            height: 10px;
-            background: #e0e0e0;
-            border-radius: 5px;
-            overflow: hidden;
-            margin: 10px 0;
+            height: 6px;
+            background: #ddd;
+            margin-bottom: 15px;
         }
 
         .progress-bar {
             height: 100%;
-            width: 0%;
             background: var(--safe-green);
-            transition: width 0.3s ease, background 0.3s ease;
+            width: 0%;
+            transition: width 0.4s ease;
         }
 
-        .warning-msg {
+        .warning-text {
             color: var(--tridonic-red);
+            font-weight: bold;
             font-size: 12px;
             display: none;
-            margin-top: 5px;
+            text-align: center;
         }
 
         .is-overloaded .progress-bar { background: var(--tridonic-red); }
-        .is-overloaded .warning-msg { display: block; }
+        .is-overloaded .warning-text { display: block; }
+
+        /* Footer & Imprint */
+        footer {
+            margin-top: 60px;
+            padding: 40px;
+            background-color: var(--tridonic-dark-gray);
+            color: #ffffff;
+            font-size: 13px;
+        }
+
+        .imprint-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 40px;
+        }
+
+        .imprint-section h3 {
+            border-bottom: 1px solid #555;
+            padding-bottom: 10px;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .imprint-details p { margin: 5px 0; color: #ccc; }
     </style>
 </head>
 <body>
 
+<header>
+    <div class="logo">
+        <!-- Linking to Tridonic Website Image asset -->
+        <img src="https://www.tridonic.com/en/int/images/tridonic-logo.svg" alt="Tridonic Logo">
+    </div>
+    <div class="tool-title">
+        <h1>Bus Power Configurator</h1>
+    </div>
+</header>
+
 <div class="container">
-    <header>
-        <h1>DALI Bus Power Configurator</h1>
-        <p>Project Planning Tool for <strong>sceneCOM evo</strong></p>
-    </header>
-
-    <div class="configurator-grid">
-        <!-- Generate 3 Lines -->
-        <script>
-            for (let i = 1; i <= 3; i++) {
-                document.write(`
-                <div class="dali-line-card" id="line-container-${i}">
-                    <h2>DALI Line ${i}</h2>
-                    <div class="input-group">
-                        <label>LED Drivers (2mA)</label>
-                        <input type="number" min="0" value="0" class="input-device" data-line="${i}" data-ma="2" data-addr="1">
-                    </div>
-                    <div class="input-group">
-                        <label>MSensors G3 (8mA)</label>
-                        <input type="number" min="0" value="0" class="input-device" data-line="${i}" data-ma="8" data-addr="1">
-                    </div>
-                    <div class="input-group">
-                        <label>DALI XC/Panels (6mA)</label>
-                        <input type="number" min="0" value="0" class="input-device" data-line="${i}" data-ma="6" data-addr="1">
-                    </div>
-                    <div class="input-group">
-                        <label>Emergency Units (2mA)</label>
-                        <input type="number" min="0" value="0" class="input-device" data-line="${i}" data-ma="2" data-addr="1">
-                    </div>
-
-                    <div class="status-panel">
-                        <div class="metric">Current: <span id="current-${i}">0</span> / 200 mA</div>
-                        <div class="progress-container">
-                            <div class="progress-bar" id="bar-ma-${i}"></div>
-                        </div>
-                        <div class="metric">Addresses: <span id="addr-${i}">0</span> / 64</div>
-                        <div class="progress-container">
-                            <div class="progress-bar" id="bar-addr-${i}"></div>
-                        </div>
-                        <p class="warning-msg" id="warn-${i}">⚠️ Limit Exceeded!</p>
-                    </div>
-                </div>
-                `);
-            }
-        </script>
+    <div class="configurator-grid" id="app-grid">
+        <!-- Lines generated by JavaScript -->
     </div>
 </div>
+
+<footer>
+    <div class="imprint-grid">
+        <div class="imprint-section">
+            <h3>Imprint</h3>
+            <div class="imprint-details">
+                <p><strong>Tridonic GmbH & Co KG</strong></p>
+                <p>Färbergasse 15</p>
+                <p>6851 Dornbirn, Austria</p>
+                <p>T +43 5572 395-0</p>
+                <p>sales@tridonic.com</p>
+                <p>www.tridonic.com</p>
+            </div>
+        </div>
+        <div class="imprint-section">
+            <h3>Legal Information</h3>
+            <div class="imprint-details">
+                <p>Company register number: 218728i</p>
+                <p>Register court: Landesgericht Feldkirch</p>
+                <p>VAT registration number: ATU53377108</p>
+                <p>Chamber membership: Chamber of Commerce Vorarlberg</p>
+            </div>
+        </div>
+    </div>
+</footer>
 
 <script>
     const MAX_MA = 200;
     const MAX_ADDR = 64;
 
-    function updateCalculations() {
-        for (let line = 1; line <= 3; line++) {
-            let totalMA = 0;
-            let totalAddr = 0;
+    const DEVICE_TYPES = [
+        { name: "LED Driver (one4all/ADV)", ma: 2, addr: 1, cat: "Outputs" },
+        { name: "DALI MSensor G3", ma: 8, addr: 1, cat: "Sensors" },
+        { name: "DALI-2 CS THP-AQ (Air Quality)", ma: 4, addr: 1, cat: "Sensors" },
+        { name: "DALI XC G3 / Switch", ma: 4, addr: 1, cat: "Input Devices" },
+        { name: "DALI Touchpanel", ma: 10, addr: 1, cat: "Input Devices" },
+        { name: "DALI RM Relay Module", ma: 3, addr: 1, cat: "Actuators" }
+    ];
 
-            // Find all inputs belonging to this line
-            const inputs = document.querySelectorAll(`.input-device[data-line="${line}"]`);
-            
-            inputs.forEach(input => {
-                const qty = parseInt(input.value) || 0;
-                totalMA += qty * parseInt(input.dataset.ma);
-                totalAddr += qty * parseInt(input.dataset.addr);
-            });
-
-            // Update UI Numbers
-            document.getElementById(`current-${line}`).innerText = totalMA;
-            document.getElementById(`addr-${line}`).innerText = totalAddr;
-
-            // Update Bars
-            const maPercent = Math.min((totalMA / MAX_MA) * 100, 100);
-            const addrPercent = Math.min((totalAddr / MAX_ADDR) * 100, 100);
-            
-            document.getElementById(`bar-ma-${line}`).style.width = maPercent + "%";
-            document.getElementById(`bar-addr-${line}`).style.width = addrPercent + "%";
-
-            // Check Limits
-            const container = document.getElementById(`line-container-${line}`);
-            if (totalMA > MAX_MA || totalAddr > MAX_ADDR) {
-                container.classList.add('is-overloaded');
-            } else {
-                container.classList.remove('is-overloaded');
-            }
+    function init() {
+        const grid = document.getElementById('app-grid');
+        for (let i = 1; i <= 3; i++) {
+            grid.innerHTML += createLineUI(i);
         }
     }
 
-    // Add event listeners to all inputs
-    document.querySelectorAll('.input-device').forEach(input => {
-        input.addEventListener('input', updateCalculations);
-    });
+    function createLineUI(id) {
+        let content = "";
+        let currentCat = "";
+
+        DEVICE_TYPES.forEach(dev => {
+            if (dev.cat !== currentCat) {
+                currentCat = dev.cat;
+                content += `<div class="category-label">${currentCat}</div>`;
+            }
+            content += `
+                <div class="input-row">
+                    <div class="device-info">
+                        ${dev.name}
+                        <span class="device-specs">${dev.ma}mA | ${dev.addr} Address</span>
+                    </div>
+                    <input type="number" min="0" value="0" 
+                           class="calc-trigger" 
+                           data-line="${id}" 
+                           data-ma="${dev.ma}" 
+                           data-addr="${dev.addr}"
+                           oninput="recalculate(${id})">
+                </div>`;
+        });
+
+        return `
+            <div class="dali-line-card" id="card-${id}">
+                <h2>DALI Line ${id}</h2>
+                ${content}
+                <div class="status-panel">
+                    <div class="metric">Line Load: <span id="ma-${id}">0</span> mA / ${MAX_MA}</div>
+                    <div class="progress-container"><div class="progress-bar" id="bar-ma-${id}"></div></div>
+                    
+                    <div class="metric">Addresses: <span id="addr-${id}">0</span> / ${MAX_ADDR}</div>
+                    <div class="progress-container"><div class="progress-bar" id="bar-addr-${id}"></div></div>
+                    
+                    <div class="warning-text" id="warn-${id}">⚠️ LIMITS EXCEEDED - CHECK PLANNING</div>
+                </div>
+            </div>`;
+    }
+
+    function recalculate(lineId) {
+        let totalMA = 0;
+        let totalAddr = 0;
+        const inputs = document.querySelectorAll(`.calc-trigger[data-line="${lineId}"]`);
+
+        inputs.forEach(input => {
+            const qty = parseInt(input.value) || 0;
+            totalMA += qty * parseFloat(input.dataset.ma);
+            totalAddr += qty * parseInt(input.dataset.addr);
+        });
+
+        document.getElementById(`ma-${lineId}`).innerText = totalMA;
+        document.getElementById(`addr-${lineId}`).innerText = totalAddr;
+
+        const maP = Math.min((totalMA / MAX_MA) * 100, 100);
+        const adP = Math.min((totalAddr / MAX_ADDR) * 100, 100);
+
+        document.getElementById(`bar-ma-${lineId}`).style.width = maP + "%";
+        document.getElementById(`bar-addr-${lineId}`).style.width = adP + "%";
+
+        const card = document.getElementById(`card-${lineId}`);
+        if (totalMA > MAX_MA || totalAddr > MAX_ADDR) {
+            card.classList.add('is-overloaded');
+        } else {
+            card.classList.remove('is-overloaded');
+        }
+    }
+
+    window.onload = init;
 </script>
 
 </body>

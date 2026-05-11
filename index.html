@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tridonic DALI Bus Power Configurator</title>
+    <style>
+        :root {
+            --tridonic-red: #eb0028;
+            --tridonic-dark: #333333;
+            --tridonic-light-grey: #f4f4f4;
+            --tridonic-border: #e0e0e0;
+            --safe-green: #28a745;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #ffffff;
+            color: var(--tridonic-dark);
+            margin: 0;
+            padding: 20px;
+        }
+
+        header {
+            border-bottom: 3px solid var(--tridonic-red);
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 { font-size: 24px; margin: 0; }
+        h2 { font-size: 18px; color: var(--tridonic-red); }
+
+        .configurator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .dali-line-card {
+            background: var(--tridonic-light-grey);
+            border: 1px solid var(--tridonic-border);
+            border-radius: 4px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        label { font-size: 14px; font-weight: 600; }
+
+        input[type="number"] {
+            width: 60px;
+            padding: 8px;
+            border: 1px solid var(--tridonic-border);
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .status-panel {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid #ddd;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .progress-container {
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--safe-green);
+            transition: width 0.3s ease, background 0.3s ease;
+        }
+
+        .warning-msg {
+            color: var(--tridonic-red);
+            font-size: 12px;
+            display: none;
+            margin-top: 5px;
+        }
+
+        .is-overloaded .progress-bar { background: var(--tridonic-red); }
+        .is-overloaded .warning-msg { display: block; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>DALI Bus Power Configurator</h1>
+        <p>Project Planning Tool for <strong>sceneCOM evo</strong></p>
+    </header>
+
+    <div class="configurator-grid">
+        <!-- Generate 3 Lines -->
+        <script>
+            for (let i = 1; i <= 3; i++) {
+                document.write(`
+                <div class="dali-line-card" id="line-container-${i}">
+                    <h2>DALI Line ${i}</h2>
+                    <div class="input-group">
+                        <label>LED Drivers (2mA)</label>
+                        <input type="number" min="0" value="0" class="input-device" data-line="${i}" data-ma="2" data-addr="1">
+                    </div>
+                    <div class="input-group">
+                        <label>MSensors G3 (8mA)</label>
+                        <input type="number" min="0" value="0" class="input-device" data-line="${i}" data-ma="8" data-addr="1">
+                    </div>
+                    <div class="input-group">
+                        <label>DALI XC/Panels (6mA)</label>
+                        <input type="number" min="0" value="0" class="input-device" data-line="${i}" data-ma="6" data-addr="1">
+                    </div>
+                    <div class="input-group">
+                        <label>Emergency Units (2mA)</label>
+                        <input type="number" min="0" value="0" class="input-device" data-line="${i}" data-ma="2" data-addr="1">
+                    </div>
+
+                    <div class="status-panel">
+                        <div class="metric">Current: <span id="current-${i}">0</span> / 200 mA</div>
+                        <div class="progress-container">
+                            <div class="progress-bar" id="bar-ma-${i}"></div>
+                        </div>
+                        <div class="metric">Addresses: <span id="addr-${i}">0</span> / 64</div>
+                        <div class="progress-container">
+                            <div class="progress-bar" id="bar-addr-${i}"></div>
+                        </div>
+                        <p class="warning-msg" id="warn-${i}">⚠️ Limit Exceeded!</p>
+                    </div>
+                </div>
+                `);
+            }
+        </script>
+    </div>
+</div>
+
+<script>
+    const MAX_MA = 200;
+    const MAX_ADDR = 64;
+
+    function updateCalculations() {
+        for (let line = 1; line <= 3; line++) {
+            let totalMA = 0;
+            let totalAddr = 0;
+
+            // Find all inputs belonging to this line
+            const inputs = document.querySelectorAll(`.input-device[data-line="${line}"]`);
+            
+            inputs.forEach(input => {
+                const qty = parseInt(input.value) || 0;
+                totalMA += qty * parseInt(input.dataset.ma);
+                totalAddr += qty * parseInt(input.dataset.addr);
+            });
+
+            // Update UI Numbers
+            document.getElementById(`current-${line}`).innerText = totalMA;
+            document.getElementById(`addr-${line}`).innerText = totalAddr;
+
+            // Update Bars
+            const maPercent = Math.min((totalMA / MAX_MA) * 100, 100);
+            const addrPercent = Math.min((totalAddr / MAX_ADDR) * 100, 100);
+            
+            document.getElementById(`bar-ma-${line}`).style.width = maPercent + "%";
+            document.getElementById(`bar-addr-${line}`).style.width = addrPercent + "%";
+
+            // Check Limits
+            const container = document.getElementById(`line-container-${line}`);
+            if (totalMA > MAX_MA || totalAddr > MAX_ADDR) {
+                container.classList.add('is-overloaded');
+            } else {
+                container.classList.remove('is-overloaded');
+            }
+        }
+    }
+
+    // Add event listeners to all inputs
+    document.querySelectorAll('.input-device').forEach(input => {
+        input.addEventListener('input', updateCalculations);
+    });
+</script>
+
+</body>
+</html>

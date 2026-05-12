@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tridonic | DALI Bus Power Configurator</title>
-    <!-- Importing Inter for that modern Tridonic look -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -13,18 +12,16 @@
             --tri-gray-bg: #f9f9f9;
             --tri-border: #e5e5e5;
             --tri-text-muted: #666666;
-            --status-ok: #008a4b;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: var(--tri-gray-bg);
             color: var(--tri-black);
             margin: 0;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Top Navigation - Mirroring tridonic.com */
         header {
             background: #fff;
             padding: 24px 50px;
@@ -55,13 +52,12 @@
             margin-top: 10px;
         }
 
-        /* Configurator Area */
         .main-container {
-            max-width: 1300px;
+            max-width: 1350px;
             margin: 0 auto;
             padding: 40px 50px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 24px;
         }
 
@@ -86,7 +82,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             color: var(--tri-text-muted);
-            margin: 20px 0 10px 0;
+            margin: 25px 0 10px 0;
             font-weight: 700;
         }
 
@@ -94,26 +90,48 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
+            padding: 14px 0;
             border-bottom: 1px solid #f0f0f0;
         }
 
-        .device-label { font-size: 14px; font-weight: 400; }
-        .device-sub { font-size: 12px; color: var(--tri-text-muted); display: block; }
+        .device-label { 
+            font-size: 14px; 
+            font-weight: 500; 
+            flex: 1;
+        }
+
+        /* The technical info requested */
+        .tech-spec {
+            font-size: 12px;
+            color: var(--tri-red);
+            background: #fff1f2;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-left: 10px;
+            font-weight: 600;
+        }
+
+        .device-sub { 
+            font-size: 12px; 
+            color: var(--tri-text-muted); 
+            display: block; 
+            margin-top: 2px;
+            font-weight: 400;
+        }
 
         input[type="number"] {
-            width: 50px;
+            width: 55px;
             border: 1px solid var(--tri-border);
             padding: 8px;
             font-family: inherit;
             font-size: 14px;
             text-align: center;
             outline: none;
+            transition: border-color 0.2s;
         }
 
         input:focus { border-color: var(--tri-red); }
 
-        /* Results Panel */
         .results {
             margin-top: auto;
             padding-top: 30px;
@@ -122,15 +140,18 @@
         .metric-row {
             display: flex;
             justify-content: space-between;
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 600;
             margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .progress-bg {
             height: 2px;
             background: #eee;
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .progress-fill {
@@ -139,7 +160,6 @@
             transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Error States */
         .is-overlimit .progress-fill { background: var(--tri-red); }
         .is-overlimit .error-msg { display: block; }
 
@@ -149,9 +169,11 @@
             font-weight: 700;
             display: none;
             margin-top: 10px;
+            text-align: center;
+            border: 1px solid var(--tri-red);
+            padding: 8px;
         }
 
-        /* Footer */
         footer {
             background: var(--tri-black);
             color: #fff;
@@ -163,8 +185,8 @@
             max-width: 1200px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 100px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 60px;
         }
 
         .footer-col h4 {
@@ -188,14 +210,12 @@
 </header>
 
 <div class="headline-section">
-    <p>Project Planning Tool</p>
+    <p>Internal Planning Tool</p>
     <h1>DALI Bus Power Configurator</h1>
-    <p>Calculate electrical loads and address limits for sceneCOM evo installations.</p>
+    <p>Verify current consumption and address limits for <strong>sceneCOM evo</strong> lines.</p>
 </div>
 
-<div class="main-container" id="line-grid">
-    <!-- Lines Injected Here -->
-</div>
+<div class="main-container" id="line-grid"></div>
 
 <footer>
     <div class="footer-grid">
@@ -206,8 +226,9 @@
             <p>T +43 5572 395-0 | sales@tridonic.com</p>
         </div>
         <div class="footer-col">
-            <h4>Legal</h4>
-            <p>VAT: ATU53377108 | Reg: 218728i</p>
+            <h4>Legal Information</h4>
+            <p>VAT ID: ATU53377108</p>
+            <p>Commercial Register: LG Feldkirch, FN 218728i</p>
             <p>© 2026 Tridonic. All rights reserved.</p>
         </div>
     </div>
@@ -219,11 +240,11 @@
         MAX_ADDR: 64,
         DEVICES: [
             { name: "LED Driver", sub: "one4all / EXC / ADV", ma: 2, addr: 1, cat: "Output" },
-            { name: "MSensor G3", sub: "Multi-sensor PIR", ma: 8, addr: 1, cat: "Sensor" },
+            { name: "DALI RM", sub: "Relay Module (Switching)", ma: 3, addr: 1, cat: "Output" },
+            { name: "DALI MSensor G3", sub: "Presence & Light Sensor", ma: 8, addr: 1, cat: "Sensor" },
             { name: "DALI-2 CS THP-AQ", sub: "Air Quality / Temp / Hum", ma: 4, addr: 1, cat: "Sensor" },
-            { name: "DALI XC G3", sub: "Switch / Scene Module", ma: 4, addr: 1, cat: "Interface" },
-            { name: "DALI Touchpanel", sub: "User Control Interface", ma: 10, addr: 1, cat: "Interface" },
-            { name: "DALI RM", sub: "Relay Module", ma: 3, addr: 1, cat: "Actuator" }
+            { name: "DALI XC G3", sub: "Switch Interface / Scene Module", ma: 4, addr: 1, cat: "Interface" },
+            { name: "DALI Touchpanel", sub: "DALI-2 Control Panel", ma: 10, addr: 1, cat: "Interface" }
         ]
     };
 
@@ -245,7 +266,10 @@
             }
             rows += `
                 <div class="input-row">
-                    <div class="device-label">${d.name}<span class="device-sub">${d.sub}</span></div>
+                    <div class="device-label">
+                        ${d.name} <span class="tech-spec">${d.ma} mA</span>
+                        <span class="device-sub">${d.sub}</span>
+                    </div>
                     <input type="number" min="0" value="0" class="val-in" 
                            data-line="${id}" data-ma="${d.ma}" data-addr="${d.addr}"
                            oninput="calc(${id})">
@@ -257,11 +281,11 @@
                 <h2>DALI Line 0${id}</h2>
                 ${rows}
                 <div class="results">
-                    <div class="metric-row"><span>Bus Load</span><span id="txt-ma-${id}">0 mA</span></div>
+                    <div class="metric-row"><span>Total Load</span><span id="txt-ma-${id}">0 mA</span></div>
                     <div class="progress-bg"><div class="progress-fill" id="bar-ma-${id}"></div></div>
-                    <div class="metric-row"><span>Addresses</span><span id="txt-addr-${id}">0 / 64</span></div>
+                    <div class="metric-row"><span>Address Limit</span><span id="txt-addr-${id}">0 / 64</span></div>
                     <div class="progress-bg"><div class="progress-fill" id="bar-addr-${id}"></div></div>
-                    <div class="error-msg" id="err-${id}">PLANNING ERROR: CAPACITY EXCEEDED</div>
+                    <div class="error-msg" id="err-${id}">⚠️ LIMIT EXCEEDED</div>
                 </div>
             </div>`;
     }
